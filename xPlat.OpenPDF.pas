@@ -1,11 +1,11 @@
 unit xPlat.OpenPDF;
 interface
 uses
-  //InstruÁıes:
+  //Instru√ß√µes:
   {
-    ImportantÌssimo:
+    Important√≠ssimo:
     #1.
-      … necess·ria a inclus„o das TAGs abaixo no AndroidManifest.Template.xml
+      √â necess√°ria a inclus√£o das TAGs abaixo no AndroidManifest.Template.xml
       android:grantUriPermissions="true"
       android:requestLegacyExternalStorage="true"
 
@@ -22,7 +22,7 @@ uses
       android:grantUriPermissions="true"
       android:requestLegacyExternalStorage="true"
     >
-    #2. … importante dar acesso ‡s opÁıes
+    #2. √â importante dar acesso √†s op√ß√µes
     READ_EXTERNAL_STORAGE
     WRITE_EXTERNAL_STORAGE
     Recomendo o uso componente MobilePermissions
@@ -31,9 +31,9 @@ uses
     MobilePermissions1.DANGEROUS.ReadExternalStorage  := True;
     MobilePermissions1.DANGEROUs.WriteExternalStorage := True;
     MobilePermissions1.Aply;
-    #3. Ative a opÁ„o Secure File Sharing em
+    #3. Ative a op√ß√£o Secure File Sharing em
       Project > Options > Application > Entitlement List
-    Essa Unit n„o foi totalmente testa em macOS e iOS
+    Essa Unit n√£o foi totalmente testa em macOS e iOS
   }
     System.SysUtils
   , System.Classes
@@ -139,7 +139,7 @@ begin
   LToolbar.Align           := TAlignLayout.Top;
   LToolbar.StyleLookup     := 'toolbarstyle';
   LToolbar.Parent          := LForm;
-  {Bot„o Back}
+  {Bot√£o Back}
   LBtnClose                := TButton.Create(LForm);
   LBtnClose.Align          := TAlignLayout.Left;
   LBtnClose.Margins.Left   := 8;
@@ -174,10 +174,25 @@ var
   LSharedPath    : String;       //Shared path on Android
   LPathDocs      : string;       //Documents path on Android
   LCompletePath  : string;
+  
+ LExtensao, LTipo  : String;
 begin
   LPathDocs     := System.IOUtils.TPath.Combine(System.IOUtils.TPath.GetDocumentsPath, AFilename);
   if not TFile.Exists(LPathDocs) then
-    raise Exception.Create('Arquivo n„o existe.' +#13#10 + LPathDocs);
+    raise Exception.Create('Arquivo n√£o existe.' + #13#10 + LPathDocs);
+
+  LExtensao := ExtractFileExt(LPathDocs);
+  if (UpperCase(LExtensao) = '.PDF') then
+    LTipo :=  'application/pdf'
+  else if ((UpperCase(LExtensao) = '.DOC') OR (UpperCase(LExtensao) = '.DOCX')) then
+    LTipo :=  'application/msword'
+  else if ((UpperCase(LExtensao) = '.XLS') OR (UpperCase(LExtensao) = '.XLSX')) then
+    LTipo :=  'application/vnd.ms-excel'
+  else if (UpperCase(LExtensao) = '.PNG') then
+    LTipo :=  'image/png'
+  else
+    LTipo :=  'image/jpeg';
+    
   LSharedPath := System.IOUtils.TPath.GetPublicPath;
   if not TDirectory.Exists(LSharedPath) then
     TDirectory.CreateDirectory(LSharedPath);
@@ -189,7 +204,7 @@ begin
              True);
   LIntent       := TJIntent.JavaClass.init(TJintent.JavaClass.ACTION_VIEW);
   LURI          := GetFileURI(LCompletePath);
-  LIntent.setDataAndType(LURI, StringToJString('application/pdf'));
+  LIntent.setDataAndType(LURI, StringToJString(LTipo));
   LIntent.setFlags(TJintent.JavaClass.FLAG_GRANT_READ_URI_PERMISSION);
   TAndroidHelper.Activity.startActivity(LIntent);
 end;
@@ -198,7 +213,7 @@ end;
 class procedure TOpenPDF.Open(AFilename: string);
 begin
   if not TFile.Exists(AFilename) then
-    raise Exception.Create('Arquivo n„o existe.' +#13#10 + AFilename);
+    raise Exception.Create('Arquivo n√£o existe.' +#13#10 + AFilename);
   ForceDirectories(ExtractFilePath(AFilename));
   ShowPDFViewer(AFilename);
 end;
@@ -207,7 +222,7 @@ end;
 class procedure TOpenPDF.Open(AFilename: string);
 begin
   if not TFile.Exists(AFilename) then
-    raise Exception.Create('Arquivo n„o existe.' +#13#10 + AFilename);
+    raise Exception.Create('Arquivo n√£o existe.' +#13#10 + AFilename);
   ForceDirectories(ExtractFilePath(AFilename));
   ShowPDFViewer(AFilename);
 end;
